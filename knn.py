@@ -1,28 +1,9 @@
 from sklearn.datasets import load_iris
 import numpy as np
 import pandas as pd
-from collections import Counter
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
-
-
-# Importowane są niezbędne biblioteki: sklearn.datasets do wczytania zbioru danych Iris, numpy do operacji numerycznych, pandas do manipulacji danymi,
-# Counter z modułu collections do zliczania wystąpień, KNeighborsClassifier z sklearn.neighbors do klasyfikacji KNN z użyciem biblioteki scikit-learn.
-# Za pomocą load_iris() wczytywany jest zbiór danych Iris. Wczytywane są cechy (x) oraz etykiety (y) dla każdego przykładu.
-# Następuje podział danych na zbiór treningowy (70% danych) i zbiór testowy (30%) za pomocą train_test_split() z sklearn.model_selection.
-# Funkcja euc() oblicza odległość Euklidesową między punktami w zbiorze treningowym x_train a pojedynczym punktem i. Przechodzi przez każdy wiersz w zbiorze treningowym
-# i oblicza odległość dla każdej cechy. Wyniki są zapisywane w ramce danych distances i zwracane jako wynik funkcji.
-# Funkcja nearest_neighbors() sortuje wyniki odległości punktu distance_point i wybiera k najbliższych sąsiadów. Następnie zwraca te najbliższe sąsiadki.
-# Funkcja predict() prognozuje klasę na podstawie najbliższych sąsiadów. Wykorzystuje obiekt Counter do zliczania wystąpień klas w y_train dla indeksów najbliższych sąsiadów.
-# Zwraca klasę, która występuje najczęściej.
-# Funkcja knn() implementuje algorytm KNN dla zestawu testowego. Iteruje przez każdy punkt w x_test.
-# Jeśli metryka jest ustawiona na "euc" (odległość Euklidesowa), oblicza odległości między x_train a tym punktem testowym, a następnie znajduje k najbliższych sąsiadów.
-# Na podstawie tych sąsiadów przewiduje klasę za pomocą funkcji predict() i dodaje wynik do listy klas.
-# Na koniec, wynik klasyfikacji z funkcji knn() jest wydrukowany (xk).
-# Następnie tworzony jest obiekt KNeighborsClassifier o k=4 sąsiadach.
-# Przygotowuje się model klasyfikatora na zbiorze treningowym za pomocą fit(). Przewiduje klasy dla zbioru testowego za pomocą predict() i wynik jest drukowany (yk).
-# Podsumowując, kod ten implementuje KNN za pomocą dwóch różnych metod - niestandardowej implementacji (knn) oraz wbudowanej klasyfikatora KNN z biblioteki scikit-learn (KNeighborsClassifier).
-# Porównuje wyniki tych dwóch implementacji dla zbioru danych Iris.
+from sklearn.metrics import accuracy_score
 
 
 iris = load_iris()
@@ -44,7 +25,7 @@ def euc(x_train, i):
     return distances
 
 
-def man(x_train, i):
+def manhattan(x_train, i):
     distances = []
     for row in range(len(x_train)):
         current_i = x_train[row]
@@ -57,39 +38,42 @@ def man(x_train, i):
 
 
 def nearest_neighbors(distance_point, k):
-    nearest = distance_point.sort_values(by=['dist'], axis=0)
-    nearest = nearest[:k]
-    return nearest
+    nearest_indices = np.argsort(distance_point['dist'])[:k]
+    return distance_point.iloc[nearest_indices]
 
 
 def predict(nearest, y_train):
-    counter = Counter(y_train[nearest.index])
-    classes = counter.most_common()[0][0]
-    return classes
+    classes = y_train[nearest.index]
+    unique_classes, class_counts = np.unique(classes, return_counts=True)
+    most_common_class = unique_classes[np.argmax(class_counts)]
+    return most_common_class
 
 
-def knn(k, m, x_test, x_train, y_train=None):
+def knn(k, m , x_test, x_train, y_train=None):
     classes = []
-
     for i in x_test:
         if m == "euc":
             distance_point = euc(x_train, i)
             nearest = nearest_neighbors(distance_point, k)
             pred = predict(nearest, y_train)
             classes.append(pred)
-        elif m == "man":
-            distance_point = man(x_train, i)
+        if m == "man":
+            distance_point = manhattan(x_train, i)
             nearest = nearest_neighbors(distance_point, k)
             pred = predict(nearest, y_train)
             classes.append(pred)
-
     return classes
 
 
-xk = knn(42, 'euc', x_test, x_train, y_train)
-print(xk)
-zk = knn(42, 'man', x_test, x_train, y_train)
-kn = KNeighborsClassifier(42)
+xke = knn(3, 'euc', x_test, x_train, y_train)
+xk = knn(3, 'man', x_test, x_train, y_train)
+print("Wynik funkcji Manhattan: \n", xk)
+print("Wynik funkcji Euclides: \n", xke)
+kn = KNeighborsClassifier(3)
 kn.fit(x_train, y_train)
 yk = kn.predict(x_test)
-print(yk)
+print("Wynik funkcji z sklearn: \n", yk)
+print(f'Euclides {accuracy_score(y_test, xke)}')
+print(f'Manhattan {accuracy_score(y_test, xk)}')
+print(f'Sklearn {accuracy_score(y_test, yk)}')
+
