@@ -1,0 +1,141 @@
+from sklearn.datasets import load_iris: Importuje funkcję load_iris z biblioteki scikit-learn, która służy do wczytania zbioru danych iris.
+
+import numpy as np: Importuje bibliotekę NumPy, która dostarcza narzędzia do operacji na tablicach i macierzach.
+
+import pandas as pd: Importuje bibliotekę pandas, która dostarcza narzędzia do manipulacji i analizy danych w formie ramki danych.
+
+from sklearn.neighbors import KNeighborsClassifier: Importuje klasę KNeighborsClassifier z biblioteki scikit-learn, która reprezentuje algorytm k najbliższych sąsiadów.
+
+from sklearn.model_selection import train_test_split: Importuje funkcję train_test_split z biblioteki scikit-learn, która służy do podziału zbioru danych na zbiór treningowy i testowy.
+
+from sklearn.metrics import accuracy_score: Importuje funkcję accuracy_score z biblioteki scikit-learn, która służy do obliczania dokładności klasyfikacji.
+
+iris = load_iris(): Wczytuje zbiór danych iris do zmiennej iris przy użyciu funkcji load_iris().
+
+x = iris.data: Przypisuje cechy zbioru iris do zmiennej x.
+
+y = iris.target: Przypisuje etykiety zbioru iris do zmiennej y.
+
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3): Dzieli zbiór danych na zbiór treningowy i testowy przy użyciu funkcji train_test_split(). Parametr test_size=0.3 oznacza, że 30% danych będzie stanowić zbiór testowy.
+
+Definicja funkcji euc(x_train, i): Funkcja oblicza odległość euklidesową między punktem i a każdym punktem w zbiorze treningowym x_train. Wykorzystuje iterację i oblicza odległość jako pierwiastek kwadratowy z sumy kwadratów różnic cech.
+
+Definicja funkcji manhattan(x_train, i): Funkcja oblicza odległość Manhattan między punktem i a każdym punktem w zbiorze treningowym x_train. Wykorzystuje iterację i oblicza odległość jako sumę bezwzględnych różnic cech.
+
+Definicja funkcji nearest_neighbors(distance_point, k): Funkcja znajduje k najbliższych sąsiadów na podstawie obliczonych odległości. Wykorzystuje funkcję argsort() z biblioteki NumPy do sortowania odległości i zwraca indeksy k najbliższych punktów.
+
+Definicja funkcji predict(nearest, y_train): Funkcja przewiduje klasę na podstawie najbliższych sąsiadów. Oblicza najczęściej występującą klasę wśród najbliższych sąsiadów.
+
+Definicja funkcji knn(k, m, x_test, x_train, y_train=None): Funkcja implementuje algorytm k najbliższych sąsiadów. Dla każdego punktu w zbiorze testowym, oblicza odległość między tym punktem a punktami w zbiorze treningowym za pomocą odpowiedniej metryki (euc lub manhattan). Następnie znajduje k najbliższych sąsiadów i przewiduje klasę na podstawie tych sąsiadów.
+
+xke = knn(3, 'euc', x_test, x_train, y_train): Wywołuje funkcję knn z metryką euklidesową dla zbioru testowego i zapisuje wyniki do zmiennej xke.
+
+xk = knn(3, 'man', x_test, x_train, y_train): Wywołuje funkcję knn z metryką Manhattan dla zbioru testowego i zapisuje wyniki do zmiennej xk.
+
+kn = KNeighborsClassifier(3): Tworzy obiekt klasyfikatora k najbliższych sąsiadów z parametrem n_neighbors=3.
+
+kn.fit(x_train, y_train): Dopasowuje klasyfikator do zbioru treningowego.
+
+yk = kn.predict(x_test): Przewiduje klasy dla zbioru testowego przy użyciu klasyfikatora.
+
+Wyświetla wyniki klasyfikacji:
+
+"Wynik funkcji Manhattan" wyświetla wynik klasyfikacji dla metryki Manhattan.
+"Wynik funkcji Euclides" wyświetla wynik klasyfikacji dla metryki euklidesowej.
+"Wynik funkcji z sklearn" wyświetla wynik klasyfikacji za pomocą klasyfikatora z biblioteki scikit-learn.
+"Euclides" wyświetla dokładność klasyfikacji dla metryki euklidesowej.
+"Manhattan" wyświetla dokładność klasyfikacji dla metryki Manhattan.
+"Sklearn" wyświetla dokładność klasyfikacji za pomocą klasyfikatora z biblioteki scikit-learn.
+Kod ten wykonuje klasyfikację zbioru iris za pomocą algorytmu k najbliższych sąsiadów z metryką euklidesową i Manhattan. Następnie porównuje wyniki z wynikami uzyskanymi przy użyciu klasyfikatora z biblioteki scikit-learn i oblicza dokładność klasyfikacji dla każdej metryki.
+
+
+
+Oto wyjaśnienie funkcji w kodzie linijka po linijce:
+
+def euc(x_train, i): Definicja funkcji euc, która oblicza odległość euklidesową między punktem i a każdym punktem w zbiorze treningowym x_train.
+
+distances = []: Tworzenie pustej listy distances do przechowywania obliczonych odległości.
+
+for row in range(len(x_train)):: Pętla iterująca przez każdy punkt w zbiorze treningowym.
+
+current_i = x_train[row]: Przypisanie aktualnego punktu x_train[row] do zmiennej current_i.
+
+current_distance = 0: Inicjalizacja zmiennej current_distance na 0, która będzie przechowywać obliczoną odległość.
+
+for col in range(len(current_i)):: Pętla iterująca przez każdą cechę w aktualnym punkcie.
+
+current_distance += (current_i[col] - i[col]) ** 2: Obliczenie kwadratu różnicy między wartościami cechy aktualnego punktu i testowego punktu i, a następnie dodanie tej wartości do current_distance.
+
+current_distance = np.sqrt(current_distance): Obliczenie pierwiastka kwadratowego z current_distance w celu uzyskania ostatecznej odległości euklidesowej.
+
+distances.append(current_distance): Dodanie obliczonej odległości do listy distances.
+
+distances = pd.DataFrame(data=distances, columns=['dist']): Konwersja listy distances na obiekt DataFrame z jedną kolumną o nazwie 'dist'.
+
+return distances: Zwraca obiekt DataFrame z obliczonymi odległościami.
+
+Funkcja euc oblicza odległość euklidesową między punktem testowym i a każdym punktem w zbiorze treningowym x_train. Wykorzystuje iterację przez punkty i cechy, obliczając kwadrat różnicy dla każdej cechy, sumując je, a następnie obliczając pierwiastek kwadratowy z sumy. Wynik jest przechowywany w obiekcie DataFrame, który zawiera kolumnę 'dist' z obliczonymi odległościami dla każdego punktu treningowego. Na końcu funkcja zwraca ten obiekt DataFrame.
+
+def manhattan(x_train, i): Definicja funkcji manhattan, która oblicza odległość Manhattan między punktem i a każdym punktem w zbiorze treningowym x_train.
+
+distances = []: Tworzenie pustej listy distances do przechowywania obliczonych odległości.
+
+for row in range(len(x_train)):: Pętla iterująca przez każdy punkt w zbiorze treningowym.
+
+current_i = x_train[row]: Przypisanie aktualnego punktu x_train[row] do zmiennej current_i.
+
+current_distance = 0: Inicjalizacja zmiennej current_distance na 0, która będzie przechowywać obliczoną odległość.
+
+for col in range(len(current_i)):: Pętla iterująca przez każdą cechę w aktualnym punkcie.
+
+current_distance += abs(current_i[col] - i[col]): Dodanie wartości bezwzględnej różnicy między wartościami cechy aktualnego punktu i testowego punktu i do current_distance.
+
+distances.append(current_distance): Dodanie obliczonej odległości do listy distances.
+
+distances = pd.DataFrame(data=distances, columns=['dist']): Konwersja listy distances na obiekt DataFrame z jedną kolumną o nazwie 'dist'.
+
+return distances: Zwraca obiekt DataFrame z obliczonymi odległościami.
+
+Funkcja manhattan oblicza odległość Manhattan między punktem testowym i a każdym punktem w zbiorze treningowym x_train. Wykorzystuje iterację przez punkty i cechy, obliczając bezwzględną różnicę dla każdej cechy i sumując je. Wynik jest przechowywany w obiekcie DataFrame, który zawiera kolumnę 'dist' z obliczonymi odległościami dla każdego punktu treningowego. Na końcu funkcja zwraca ten obiekt DataFrame.
+
+Oto wyjaśnienie pozostałych funkcji:
+
+def nearest_neighbors(distance_point, k): Definicja funkcji nearest_neighbors, która przyjmuje jako argument obiekt DataFrame distance_point zawierający obliczone odległości oraz parametr k określający liczbę najbliższych sąsiadów, które mają zostać wybrane.
+
+nearest_indices = np.argsort(distance_point['dist'])[:k]: Wykorzystanie funkcji argsort z biblioteki NumPy do posortowania odległości w kolejności rosnącej i wybranie indeksów k najmniejszych odległości.
+
+return distance_point.iloc[nearest_indices]: Zwraca podzbiór obiektu DataFrame distance_point, zawierający k najbliższych sąsiadów na podstawie wybranych indeksów.
+
+Funkcja nearest_neighbors wybiera k najbliższych sąsiadów na podstawie obliczonych odległości w obiekcie DataFrame distance_point. Wykorzystuje funkcję argsort do sortowania odległości i wybiera k najmniejszych indeksów. Na końcu zwraca podzbiór obiektu DataFrame zawierający tylko te najbliższe sąsiedztwo.
+
+def predict(nearest, y_train): Definicja funkcji predict, która przyjmuje jako argument obiekt DataFrame nearest zawierający najbliższych sąsiadów oraz wektor y_train zawierający etykiety klas dla danych treningowych.
+
+classes = y_train[nearest.index]: Wybiera etykiety klas dla najbliższych sąsiadów na podstawie ich indeksów w wektorze y_train.
+
+unique_classes, class_counts = np.unique(classes, return_counts=True): Znajduje unikalne etykiety klas i zlicza ich wystąpienia wśród najbliższych sąsiadów.
+
+most_common_class = unique_classes[np.argmax(class_counts)]: Znajduje etykietę klasy, która występuje najczęściej wśród najbliższych sąsiadów, wykorzystując funkcję argmax do znalezienia indeksu klasy o największej liczbie wystąpień.
+
+return most_common_class: Zwraca etykietę klasy, która występuje najczęściej wśród najbliższych sąsiadów.
+
+Funkcja predict przewiduje klasę na podstawie najbliższych sąsiadów. Wybiera etykiety klas dla najbliższych sąsiadów na podstawie ich indeksów w wektorze etykiet y_train. Następnie znajduje unikalne klasy i zlicza ich wystąpienia. Na końcu zwraca etykietę klasy, która występuje najczęściej wśród najbliższych sąsiadów.
+
+def knn(k, m, x_test, x_train, y_train=None): Definicja funkcji knn, która przyjmuje jako argumenty parametry k (liczba sąsiadów), m (metryka: 'euc' dla odległości euklidesowej, 'man' dla odległości Manhattan) oraz dane testowe x_test, treningowe x_train i etykiety treningowe y_train (opcjonalne).
+
+classes = []: Inicjalizacja pustej listy classes, która będzie przechowywać przewidziane klasy dla danych testowych.
+
+for i in x_test:: Iteracja przez każdy punkt w danych testowych x_test.
+
+if m == "euc":: Sprawdzenie, czy metryka jest ustawiona na "euc" (odległość euklidesowa).
+
+distance_point = euc(x_train, i): Obliczenie odległości euklidesowej między punktem testowym i a wszystkimi punktami treningowymi.
+
+nearest = nearest_neighbors(distance_point, k): Wybranie k najbliższych sąsiadów na podstawie obliczonych odległości.
+
+pred = predict(nearest, y_train): Przewidzenie klasy na podstawie najbliższych sąsiadów.
+
+classes.append(pred): Dodanie przewidzianej klasy do listy classes.
+
+return classes: Zwraca listę przewidzianych klas dla danych testowych.
+
+Funkcja knn wykonuje algorytm k-najbliższych sąsiadów. Iteruje przez punkty w danych testowych i dla każdego punktu oblicza odległość między nim a punktami treningowymi. Następnie wybiera k najbliższych sąsiadów i przewiduje klasę na podstawie tych sąsiadów. Przewidziane klasy są dodawane do listy classes. Na końcu zwraca listę przewidzianych klas dla danych testowych.
